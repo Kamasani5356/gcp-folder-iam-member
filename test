@@ -1,1 +1,74 @@
 
+variable "folder_name" {
+  description = "The GCP folder ID (e.g. folders/1234567890) to apply IAM bindings to."
+  type        = string
+}
+
+variable "gcp_role_permission" {
+  description = "List of IAM roles to grant to the group/member on the folder."
+  type        = list(string)
+  default     = []
+}
+
+variable "iam_gcp_group_name" {
+  description = "The member to grant roles to. Can be passed with or without the 'group:' prefix."
+  type        = string
+  default     = ""
+}
+
+===================================================================================================================
+
+locals {
+  # Normalize the member to always have the "group:" prefix
+  formatted_member = var.iam_gcp_group_name != "" ? (
+    startswith(var.iam_gcp_group_name, "group:") ? var.iam_gcp_group_name : "group:${var.iam_gcp_group_name}"
+  ) : ""
+
+  # Clean/dedupe the role list, dropping blanks
+  cleaned_roles = [
+    for r in var.gcp_role_permission : trimspace(r) if r != null && trimspace(r) != ""
+  ]
+
+  # Only proceed if we have a valid member AND at least one valid role
+  valid_member = length(trimspace(local.formatted_member)) > 0
+  valid_roles  = length(local.cleaned_roles) > 0
+
+  # for_each requires a set/map of strings — convert list to a set
+  roles_to_apply = (local.valid_member && local.valid_roles) ? toset(local.cleaned_roles) : toset([])
+}
+
+resource "google_folder_iam_member" "gcp_group" {
+  for_each = local.roles_to_apply
+
+  folder = var.folder_name
+  role   = each.value
+  member = local.formatted_member
+}
+
+========================================================================================================================================
+
+output "applied_roles" {
+  description = "Map of role => google_folder_iam_member resource ID for each role applied."
+  value       = { for k, v in google_folder_iam_member.gcp_group : k => v.id }
+}
+
+output "member" {
+  description = "The formatted member the roles were applied to."
+  value       = local.formatted_member
+}
+=========================================================================================
+module "folder_iam_test" {
+  source = "../"
+
+  folder_name = "folders/123456789012"   # replace with your sandbox folder ID
+  gcp_role_permission = [
+    "roles/viewer",
+    "roles/storage.objectViewer",
+    "roles/logging.viewer",
+  ]
+  iam_gcp_group_name = "myteam@example.com"   # or "group:myteam@example.com"
+}
+
+output "test_applied_roles" {
+  value = module.folder_iam_test.applied_roles
+}
