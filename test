@@ -72,3 +72,34 @@ module "folder_iam_test" {
 output "test_applied_roles" {
   value = module.folder_iam_test.applied_roles
 }
+
+locals {
+  # Safely normalize inputs that might be null (not just empty)
+  safe_member = coalesce(var.iam_gcp_group_name, "")
+  safe_roles  = coalesce(var.gcp_role_permission, [])
+
+  # Normalize the member to always have the "group:" prefix
+  formatted_member = local.safe_member != "" ? (
+    startswith(local.safe_member, "group:") ? local.safe_member : "group:${local.safe_member}"
+  ) : ""
+
+  # Clean/dedupe the role list, dropping blanks
+  cleaned_roles = [
+    for r in local.safe_roles : trimspace(r) if r != null && trimspace(r) != ""
+  ]
+
+  # Only proceed if we have a valid member AND at least one valid role
+  valid_member = length(trimspace(local.formatted_member)) > 0
+  valid_roles  = length(local.cleaned_roles) > 0
+
+  # for_each requires a set/map of strings — convert list to a set
+  roles_to_apply = (local.valid_member && local.valid_roles) ? toset(local.cleaned_roles) : toset([])
+}
+
+resource "google_folder_iam_member" "gcp_group" {
+  for_each = local.roles_to_apply
+
+  folder = var.folder_name
+  role   = each.value
+  member = local.formatted_member
+}
