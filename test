@@ -19,3 +19,26 @@ Story 4: Enforce Status Checks on Merge
 
 Mark CI pipeline results (lint, validate, security scan) as required status checks in branch protection settings.
 Configure GitHub to block merging any PR into protected branches until all required checks pass successfully.
+=============================================================================================================================
+
+
+Story 1: Multi-Stage Jenkins Pipeline for Terraform Lifecycle
+
+Engineer a Jenkins pipeline covering the full Plan, Validate, and Apply stages for GCP Terraform modules.
+Eliminate manual Terraform execution by triggering the entire deployment lifecycle through the pipeline.
+Ensure each stage runs sequentially with approval gates before applying changes to GCP resources.
+
+Story 2: Secure Authentication for Jenkins-to-GCP Automation
+
+Integrate secret management within Jenkins to securely store and retrieve GCP credentials.
+Configure service account impersonation so Jenkins authenticates with Google Cloud without exposing long-lived keys.
+
+Story 3: Multi-Environment Deployment Orchestration
+
+Configure pipeline logic to support environment-specific deployments across Dev, Staging, and Prod.
+Implement centralized Terraform state management to maintain consistency across all environments.
+
+Story 4: Deployment Auditability & Logging
+
+Implement automated logging for every infrastructure change triggered through the pipeline.
+Ensure logs provide a clear, traceable audit trail for each deployment event.
