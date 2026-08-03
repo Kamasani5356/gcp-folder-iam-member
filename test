@@ -1,44 +1,41 @@
-Story 1: GitHub Branch Protection Rules
+Here are both points fully structured as Jira-ready issues.
 
-Enable branch protection on main/master requiring at least one mandatory reviewer approval before any PR can be merged.
-Configure the repository to accept only signed commits, ensuring commit authenticity and traceability.
-Disable direct pushes to protected branches so all changes must go through a reviewed Pull Request.
+---
 
-Story 2: Automated PR Validation Pipeline
+## 🟦 EPIC 1: GitHub Governance & CI/CD Quality Gates for Terraform Repositories
 
-Configure the CI pipeline to trigger automatically whenever a Pull Request is opened or updated against protected branches.
-Add a pipeline stage to run linting and terraform validate/terraform fmt to catch syntax errors and formatting issues early.
-Integrate a security scanning tool (tfsec or Checkov) into the pipeline to detect misconfigurations before merge.
+**Epic Description:** Establish a secure, standardized version control strategy across all repositories with automated validation pipelines to prevent unreviewed, unformatted, or insecure code from reaching production.
 
-Story 3: Standardize CI Across Repos
+**Story 1: GitHub Branch Protection & Governance Rules**
+*Description:* Enable branch protection on main/master requiring at least one mandatory reviewer approval before any PR can be merged. Configure the repository to accept only signed commits, ensuring commit authenticity and traceability. Disable direct pushes to protected branches so all changes must go through a reviewed Pull Request.
 
-Build a single reusable CI workflow template covering linting, validation, and security scanning stages.
-Roll out and apply this standardized template across all organization repositories to eliminate configuration drift.
+**Story 2: Automated PR Validation Pipeline**
+*Description:* Configure the CI pipeline to trigger automatically whenever a Pull Request is opened or updated against protected branches. Add a pipeline stage to run linting and `terraform validate`/`terraform fmt` to catch syntax errors and formatting issues early. Integrate a security scanning tool (tfsec or Checkov) into the pipeline to detect misconfigurations before merge.
 
-Story 4: Enforce Status Checks on Merge
+**Story 3: Standardize CI Configuration Across Repositories**
+*Description:* Build a single reusable CI workflow template covering linting, validation, and security scanning stages. Roll out and apply this standardized template across all organization repositories to eliminate configuration drift.
 
-Mark CI pipeline results (lint, validate, security scan) as required status checks in branch protection settings.
-Configure GitHub to block merging any PR into protected branches until all required checks pass successfully.
-=============================================================================================================================
+**Story 4: Enforce Required Status Checks Before Merge**
+*Description:* Mark CI pipeline results (lint, validate, security scan) as required status checks in branch protection settings. Configure GitHub to block merging any PR into protected branches until all required checks pass successfully.
 
+---
 
-Story 1: Multi-Stage Jenkins Pipeline for Terraform Lifecycle
+## 🟦 EPIC 2: Automated GCP Infrastructure Deployment Pipeline (Terraform + Jenkins)
 
-Engineer a Jenkins pipeline covering the full Plan, Validate, and Apply stages for GCP Terraform modules.
-Eliminate manual Terraform execution by triggering the entire deployment lifecycle through the pipeline.
-Ensure each stage runs sequentially with approval gates before applying changes to GCP resources.
+**Epic Description:** Eliminate manual Terraform execution by building a fully automated, secure, and auditable deployment pipeline for GCP infrastructure using Jenkins.
 
-Story 2: Secure Authentication for Jenkins-to-GCP Automation
+**Story 1: Multi-Stage Jenkins Pipeline for Terraform Lifecycle**
+*Description:* Engineer a Jenkins pipeline covering the full Plan, Validate, and Apply stages for GCP Terraform modules. Eliminate manual Terraform execution by triggering the entire deployment lifecycle through the pipeline. Ensure each stage runs sequentially with approval gates before applying changes to GCP resources.
 
-Integrate secret management within Jenkins to securely store and retrieve GCP credentials.
-Configure service account impersonation so Jenkins authenticates with Google Cloud without exposing long-lived keys.
+**Story 2: Secure Authentication for Jenkins-to-GCP Automation**
+*Description:* Integrate secret management within Jenkins to securely store and retrieve GCP credentials. Configure service account impersonation so Jenkins authenticates with Google Cloud without exposing long-lived keys.
 
-Story 3: Multi-Environment Deployment Orchestration
+**Story 3: Multi-Environment Deployment Orchestration**
+*Description:* Configure pipeline logic to support environment-specific deployments across Dev, Staging, and Prod. Implement centralized Terraform state management to maintain consistency across all environments.
 
-Configure pipeline logic to support environment-specific deployments across Dev, Staging, and Prod.
-Implement centralized Terraform state management to maintain consistency across all environments.
+**Story 4: Deployment Auditability & Logging**
+*Description:* Implement automated logging for every infrastructure change triggered through the pipeline. Ensure logs provide a clear, traceable audit trail for each deployment event.
 
-Story 4: Deployment Auditability & Logging
+---
 
-Implement automated logging for every infrastructure change triggered through the pipeline.
-Ensure logs provide a clear, traceable audit trail for each deployment event.
+Want me to convert this into a CSV file formatted for direct Jira bulk import (Epic Name, Summary, Description columns)?
