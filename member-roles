@@ -1,0 +1,35 @@
+locals {
+  group_member       = coalesce(var.iam_gcp_group_name, "")
+  group_permissions  = coalesce(var.gcp_role_permission, [])
+
+  gcp_iam_member = local.group_member != "" ? (
+    startswith(local.group_member, "group:") ? local.group_member : "group:${local.group_member}"
+  ) : ""
+
+  cleaned_roles = [
+    for r in local.group_permissions : trimspace(r) if r != null && trimspace(r) != ""
+  ]
+
+  valid_member = length(trimspace(local.gcp_iam_member)) > 0
+  valid_roles  = length(local.cleaned_roles) > 0
+
+  # Resource is created ONLY when both member and roles are non-empty.
+  # If either is missing, roles_to_apply is empty and no resource is created.
+  roles_to_apply = (local.valid_member && local.valid_roles) ? toset(local.cleaned_roles) : toset([])
+}
+
+resource "google_folder_iam_member" "gcp_group" {
+
+  for_each = local.roles_to_apply
+
+  folder = var.folder_name
+  role   = each.value
+  member = local.gcp_iam_member
+
+  lifecycle {
+    precondition {
+      condition     = local.valid_member && local.valid_roles
+      error_message = "Both 'iam_gcp_group_name' and 'gcp_role_permission' must be set (non-empty) to create google_folder_iam_member resources."
+    }
+  }
+}
